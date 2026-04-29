@@ -1,50 +1,66 @@
 package com.yusuf.kargotakip.entities.concretes;
 
-public class Cargo {
+import java.math.BigDecimal;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorColumn;
+import jakarta.persistence.DiscriminatorType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+
+@Entity
+@Table(name = "cargoes")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "cargo_type", discriminatorType = DiscriminatorType.STRING)
+@Getter
+@Setter
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+public abstract class Cargo {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "tracking_number", nullable = false, unique = true)
     private String trackingNumber;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private CargoStatus status;
+
+    @Column(name = "sender_name", nullable = false)
     private String senderName;
+
+    @Column(name = "receiver_name", nullable = false)
     private String receiverName;
 
-    public Long getId() {
-        return id;
-    }
+    @Enumerated(EnumType.STRING)
+    @Column(name = "cargo_kind", nullable = false)
+    private CargoType cargoType;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    @Column(name = "shipping_cost", nullable = false)
+    private BigDecimal shippingCost;
 
-    public String getTrackingNumber() {
-        return trackingNumber;
-    }
+    @Column(name = "priority_delivery", nullable = false)
+    private boolean priorityDelivery;
 
-    public void setTrackingNumber(String trackingNumber) {
-        this.trackingNumber = trackingNumber;
-    }
+    @Column(name = "special_handling", nullable = false)
+    private boolean specialHandling;
 
-    public CargoStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(CargoStatus status) {
-        this.status = status;
-    }
-
-    public String getSenderName() {
-        return senderName;
-    }
-
-    public void setSenderName(String senderName) {
-        this.senderName = senderName;
-    }
-
-    public String getReceiverName() {
-        return receiverName;
-    }
-
-    public void setReceiverName(String receiverName) {
-        this.receiverName = receiverName;
-    }
+    @Column(name = "cargo_description", nullable = false)
+    private String description;
 }

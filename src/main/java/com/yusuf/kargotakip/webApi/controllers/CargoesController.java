@@ -1,5 +1,6 @@
 package com.yusuf.kargotakip.webApi.controllers;
 
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,18 +12,19 @@ import com.yusuf.kargotakip.business.abstracts.CargoService;
 import com.yusuf.kargotakip.business.requests.CreateCargoRequest;
 import com.yusuf.kargotakip.business.responses.GetCargoByTrackingNumberResponse;
 
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
 @RestController
+@Validated
 @RequestMapping("/api/cargoes")
+@RequiredArgsConstructor
 public class CargoesController {
 
     private final CargoService cargoService;
 
-    public CargoesController(CargoService cargoService) {
-        this.cargoService = cargoService;
-    }
-
     @PostMapping
-    public GetCargoByTrackingNumberResponse add(@RequestBody CreateCargoRequest createCargoRequest) {
+    public GetCargoByTrackingNumberResponse add(@Valid @RequestBody CreateCargoRequest createCargoRequest) {
         return cargoService.add(createCargoRequest);
     }
 
