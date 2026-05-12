@@ -8,4 +8,6 @@ public interface CargoService {
     GetCargoByTrackingNumberResponse add(CreateCargoRequest createCargoRequest);
 
     GetCargoByTrackingNumberResponse getByTrackingNumber(String trackingNumber);
+
+    GetCargoByTrackingNumberResponse getByOrderNumber(String orderNumber);
 }

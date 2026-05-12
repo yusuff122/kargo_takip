@@ -19,13 +19,23 @@ public class CargoBusinessRules {
         }
     }
 
-    public void checkIfCargoNamesAreValid(String senderName, String receiverName) {
-        if (senderName == null || senderName.isBlank()) {
-            throw new BusinessException("Gönderici adı boş bırakılamaz.");
+    public void checkIfOrderExists(String orderNumber) {
+        if (cargoRepository.findByOrderNumber(orderNumber).isEmpty()) {
+            throw new BusinessException("Girilen sipariş numarasına ait kargo bulunamadı.");
+        }
+    }
+
+    public void checkIfScenarioFieldsAreValid(String storeName, String customerEmail, String storeEmployeeEmail) {
+        if (storeName == null || storeName.isBlank()) {
+            throw new BusinessException("Mağaza adı boş bırakılamaz.");
         }
 
-        if (receiverName == null || receiverName.isBlank()) {
-            throw new BusinessException("Alıcı adı boş bırakılamaz.");
+        if (customerEmail == null || customerEmail.isBlank()) {
+            throw new BusinessException("Müşteri e-posta adresi boş bırakılamaz.");
+        }
+
+        if (storeEmployeeEmail == null || storeEmployeeEmail.isBlank()) {
+            throw new BusinessException("Mağaza çalışanı e-posta adresi boş bırakılamaz.");
         }
     }
 }

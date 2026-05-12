@@ -13,6 +13,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,7 +25,7 @@ import lombok.experimental.SuperBuilder;
 @Entity
 @Table(name = "cargoes")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "cargo_type", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorColumn(name = "cargo_class", discriminatorType = DiscriminatorType.STRING)
 @Getter
 @Setter
 @SuperBuilder
@@ -38,18 +40,26 @@ public abstract class Cargo {
     @Column(name = "tracking_number", nullable = false, unique = true)
     private String trackingNumber;
 
+    @Column(name = "order_number", nullable = false, unique = true)
+    private String orderNumber;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private CargoStatus status;
 
-    @Column(name = "sender_name", nullable = false)
-    private String senderName;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 
-    @Column(name = "receiver_name", nullable = false)
-    private String receiverName;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "store_employee_id")
+    private StoreEmployee storeEmployee;
+
+    @Column(name = "notification_email", nullable = false)
+    private String notificationEmail;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "cargo_kind", nullable = false)
+    @Column(name = "cargo_type", nullable = false)
     private CargoType cargoType;
 
     @Column(name = "shipping_cost", nullable = false)
@@ -61,6 +71,6 @@ public abstract class Cargo {
     @Column(name = "special_handling", nullable = false)
     private boolean specialHandling;
 
-    @Column(name = "cargo_description", nullable = false)
+    @Column(name = "description", nullable = false)
     private String description;
 }

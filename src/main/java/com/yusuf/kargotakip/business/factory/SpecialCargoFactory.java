@@ -21,15 +21,15 @@ public class SpecialCargoFactory extends AbstractCargoFactory implements CargoFa
     @Override
     public Cargo create(CreateCargoRequest createCargoRequest) {
         return SpecialCargo.builder()
-                .senderName(createCargoRequest.getSenderName())
-                .receiverName(createCargoRequest.getReceiverName())
                 .trackingNumber(generateTrackingNumber())
+                .orderNumber(generateOrderNumber())
                 .status(CargoStatus.HAZIRLANIYOR)
                 .cargoType(CargoType.SPECIAL)
                 .shippingCost(new BigDecimal("129.90"))
                 .priorityDelivery(false)
                 .specialHandling(true)
                 .description("Kırılabilir veya değerli ürünler için ek korumalı özel kargo")
+                .notificationEmail(createCargoRequest.getCustomerEmail())
                 .build();
     }
 }

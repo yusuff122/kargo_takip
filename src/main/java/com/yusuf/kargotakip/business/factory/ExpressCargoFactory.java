@@ -21,15 +21,15 @@ public class ExpressCargoFactory extends AbstractCargoFactory implements CargoFa
     @Override
     public Cargo create(CreateCargoRequest createCargoRequest) {
         return ExpressCargo.builder()
-                .senderName(createCargoRequest.getSenderName())
-                .receiverName(createCargoRequest.getReceiverName())
                 .trackingNumber(generateTrackingNumber())
+                .orderNumber(generateOrderNumber())
                 .status(CargoStatus.HAZIRLANIYOR)
                 .cargoType(CargoType.EXPRESS)
                 .shippingCost(new BigDecimal("89.90"))
                 .priorityDelivery(true)
                 .specialHandling(false)
                 .description("Hızlı teslimat - daha pahalı ve öncelikli taşıma")
+                .notificationEmail(createCargoRequest.getCustomerEmail())
                 .build();
     }
 }

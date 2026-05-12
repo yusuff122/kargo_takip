@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.yusuf.kargotakip.business.abstracts.CargoService;
 import com.yusuf.kargotakip.business.requests.CreateCargoRequest;
 import com.yusuf.kargotakip.business.responses.GetCargoByTrackingNumberResponse;
@@ -16,8 +15,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@Validated
 @RequestMapping("/api/cargoes")
+@Validated
 @RequiredArgsConstructor
 public class CargoesController {
 
@@ -31,5 +30,10 @@ public class CargoesController {
     @GetMapping("/{trackingNumber}")
     public GetCargoByTrackingNumberResponse getByTrackingNumber(@PathVariable String trackingNumber) {
         return cargoService.getByTrackingNumber(trackingNumber);
+    }
+
+    @GetMapping("/order/{orderNumber}")
+    public GetCargoByTrackingNumberResponse getByOrderNumber(@PathVariable String orderNumber) {
+        return cargoService.getByOrderNumber(orderNumber);
     }
 }

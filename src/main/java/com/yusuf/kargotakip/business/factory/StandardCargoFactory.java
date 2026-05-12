@@ -21,15 +21,15 @@ public class StandardCargoFactory extends AbstractCargoFactory implements CargoF
     @Override
     public Cargo create(CreateCargoRequest createCargoRequest) {
         return StandardCargo.builder()
-                .senderName(createCargoRequest.getSenderName())
-                .receiverName(createCargoRequest.getReceiverName())
                 .trackingNumber(generateTrackingNumber())
+                .orderNumber(generateOrderNumber())
                 .status(CargoStatus.HAZIRLANIYOR)
                 .cargoType(CargoType.STANDARD)
                 .shippingCost(new BigDecimal("49.90"))
                 .priorityDelivery(false)
                 .specialHandling(false)
                 .description("Normal teslimat - en ucuz ve varsayılan kargo tipi")
+                .notificationEmail(createCargoRequest.getCustomerEmail())
                 .build();
     }
 }

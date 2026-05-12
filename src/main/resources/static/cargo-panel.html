@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gönderi Listesi</title>
+    <style>
+        :root {
+            --bg: #f6f1e8;
+            --surface: rgba(255,255,255,0.84);
+            --ink: #1f2937;
+            --muted: #6b7280;
+            --line: rgba(15, 23, 42, 0.08);
+            --shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            color: var(--ink);
+            font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(15,118,110,0.18), transparent 30%),
+                radial-gradient(circle at bottom right, rgba(234,88,12,0.14), transparent 28%),
+                var(--bg);
+        }
+        .page {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 32px 18px 48px;
+        }
+        .hero h1 {
+            margin: 0 0 10px;
+            font-size: clamp(2rem, 4vw, 4rem);
+            line-height: 0.95;
+            letter-spacing: -0.04em;
+        }
+        .hero p {
+            margin: 0 0 26px;
+            max-width: 720px;
+            color: var(--muted);
+            font-size: 1.02rem;
+        }
+        .panel {
+            border: 1px solid var(--line);
+            background: var(--surface);
+            backdrop-filter: blur(18px);
+            border-radius: 28px;
+            box-shadow: var(--shadow);
+            padding: 22px;
+        }
+        .toolbar {
+            display: grid;
+            gap: 16px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            align-items: end;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+        input, select {
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 14px 16px;
+            background: #fff;
+            font-size: 1rem;
+        }
+        button {
+            border: none;
+            border-radius: 16px;
+            padding: 14px 18px;
+            font-weight: 700;
+            color: #fff;
+            cursor: pointer;
+            background: linear-gradient(135deg, #0f766e, #115e59);
+            box-shadow: 0 14px 28px rgba(15,118,110,0.24);
+        }
+        .summary {
+            display: grid;
+            gap: 16px;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            margin: 26px 0;
+        }
+        .summary-card, .cargo-card {
+            border: 1px solid var(--line);
+            background: #fff;
+            border-radius: 22px;
+            padding: 18px;
+        }
+        .summary-card strong {
+            display: block;
+            font-size: 2rem;
+            margin-bottom: 6px;
+        }
+        .summary-card span, .muted {
+            color: var(--muted);
+        }
+        .cards {
+            display: grid;
+            gap: 16px;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        }
+        .cargo-card {
+            position: relative;
+            overflow: hidden;
+            border-width: 2px;
+            box-shadow: 0 18px 36px rgba(15, 23, 42, 0.08);
+        }
+        .cargo-card::before {
+            content: "";
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 8px;
+            background: var(--accent-color, #2563eb);
+        }
+        .card-shell {
+            position: relative;
+            padding-left: 8px;
+        }
+        .card-theme {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+            border-radius: 999px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.72);
+            border: 1px solid rgba(255,255,255,0.8);
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--accent-color, #2563eb);
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+        }
+        .card-theme-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            background: var(--accent-color, #2563eb);
+        }
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        .card-top h3 {
+            margin: 0 0 6px;
+        }
+        .badge {
+            color: #fff;
+            border-radius: 999px;
+            padding: 8px 12px;
+            font-size: 0.78rem;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+        .meta, .notes {
+            display: grid;
+            gap: 6px;
+            font-size: 0.94rem;
+            margin-top: 12px;
+        }
+        .meta {
+            margin-top: 16px;
+            padding: 14px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.72);
+        }
+        .notes {
+            padding: 14px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.58);
+            border: 1px solid rgba(255, 255, 255, 0.68);
+        }
+        .note {
+            margin-top: 12px;
+            border-radius: 16px;
+            padding: 12px 14px;
+            background: var(--note-bg, #ecfeff);
+            color: var(--note-color, #155e75);
+            font-weight: 600;
+        }
+        .empty {
+            padding-top: 12px;
+            color: var(--muted);
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <section class="hero">
+            <h1>Gönderi<br>Listesi</h1>
+            <p>Müşteri kendisine ait gönderileri, mağaza çalışanı ise oluşturduğu gönderileri bu ekrandan görüntüleyebilir.</p>
+        </section>
+
+        <section class="panel">
+            <div class="toolbar">
+                <div>
+                    <label for="role">Giriş Türü</label>
+                    <select id="role">
+                        <option value="CUSTOMER">Müşteri</option>
+                        <option value="SELLER">Mağaza Çalışanı</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="username">E-posta Adresi</label>
+                    <input id="username" value="ayse@example.com">
+                </div>
+                <button id="loadButton">Gönderileri Göster</button>
+            </div>
+
+            <div class="summary" id="summary"></div>
+            <div class="cards" id="cards"></div>
+            <div class="empty" id="empty"></div>
+        </section>
+    </div>
+
+    <script>
+        const API_BASE = window.location.protocol === "file:" ? "http://localhost:8080" : window.location.origin;
+        const summary = document.getElementById("summary");
+        const cards = document.getElementById("cards");
+        const empty = document.getElementById("empty");
+        const role = document.getElementById("role");
+        const username = document.getElementById("username");
+        const loadButton = document.getElementById("loadButton");
+
+        function renderSummary(panel) {
+            summary.innerHTML = `
+                <div class="summary-card"><strong>${panel.summary.totalCargoCount}</strong><span>Toplam Gönderi</span></div>
+                <div class="summary-card"><strong>${panel.summary.deliveredCargoCount}</strong><span>Teslim Edilen</span></div>
+                <div class="summary-card"><strong>${panel.summary.inTransitCargoCount}</strong><span>Dağıtımda</span></div>
+                <div class="summary-card"><strong>${panel.summary.expressCargoCount}</strong><span>Hızlı Teslimat</span></div>
+                <div class="summary-card"><strong>${panel.summary.specialCargoCount}</strong><span>Özel Kargo</span></div>
+            `;
+        }
+
+        function renderCards(panel) {
+            cards.innerHTML = "";
+            if (!panel.cargoes.length) {
+                empty.textContent = `${panel.username} için görüntülenecek gönderi bulunamadı.`;
+                return;
+            }
+            empty.textContent = "";
+
+            panel.cargoes.forEach(cargo => {
+                const card = document.createElement("article");
+                card.className = "cargo-card";
+                card.style.background = cargo.cardGradient;
+                card.style.borderColor = cargo.borderColor;
+                card.style.setProperty("--accent-color", cargo.accentColor);
+                card.style.setProperty("--note-bg", cargo.noteBackground);
+                card.style.setProperty("--note-color", cargo.noteTextColor);
+                card.innerHTML = `
+                    <div class="card-shell">
+                        <div class="card-theme">
+                            <span class="card-theme-dot"></span>
+                            <span>${cargo.decoratorTitle}</span>
+                        </div>
+                        <div class="card-top">
+                            <div>
+                                <h3>${cargo.orderNumber}</h3>
+                                <div class="muted">${cargo.statusDisplayText}</div>
+                            </div>
+                            <span class="badge" style="background:${cargo.badgeColor}">${cargo.badgeLabel}</span>
+                        </div>
+                        <div class="meta">
+                            <span>Takip Numarası: ${cargo.trackingNumber}</span>
+                            <span>Müşteri: ${cargo.customerFullName}</span>
+                            <span>Müşteri E-postası: ${cargo.customerEmail}</span>
+                            <span>Mağaza: ${cargo.storeName}</span>
+                            <span>Yetkili: ${cargo.storeEmployeeFullName}</span>
+                            <span>Teslimat Tipi: ${cargo.cargoType}</span>
+                            <span>Ücret: ₺${cargo.shippingCost}</span>
+                        </div>
+                        <div class="notes">
+                            <span>${cargo.description}</span>
+                            <span>Öncelikli Taşıma: ${cargo.priorityDelivery ? "Evet" : "Hayır"}</span>
+                            <span>Özel İşlem: ${cargo.specialHandling ? "Evet" : "Hayır"}</span>
+                        </div>
+                        <div class="note">${cargo.deliveryNote}</div>
+                    </div>
+                `;
+                cards.appendChild(card);
+            });
+        }
+
+        async function loadPanel() {
+            const response = await fetch(`${API_BASE}/api/cargo-panel?role=${encodeURIComponent(role.value)}&username=${encodeURIComponent(username.value)}`);
+            const payload = await response.json();
+
+            if (!response.ok) {
+                summary.innerHTML = "";
+                cards.innerHTML = "";
+                empty.textContent = payload.message || "Gönderi listesi yüklenemedi.";
+                return;
+            }
+
+            renderSummary(payload);
+            renderCards(payload);
+        }
+
+        loadButton.addEventListener("click", loadPanel);
+
+        if (window.location.protocol === "file:") {
+            empty.textContent = "Bu sayfa dosya olarak açılmış. Panelin çalışması için Spring Boot uygulamasının `http://localhost:8080` adresinde açık olması gerekir.";
+        }
+
+        loadPanel();
+    </script>
+</body>
+</html>

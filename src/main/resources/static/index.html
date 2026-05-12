@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kargo Takip</title>
+    <style>
+        :root {
+            --bg: #f7f3ea;
+            --ink: #1f2937;
+            --muted: #6b7280;
+            --surface: rgba(255,255,255,0.88);
+            --line: rgba(15, 23, 42, 0.08);
+            --brand: #0f766e;
+            --brand-2: #ea580c;
+            --shadow: 0 24px 50px rgba(15, 23, 42, 0.08);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            color: var(--ink);
+            font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(15,118,110,0.18), transparent 28%),
+                radial-gradient(circle at bottom right, rgba(234,88,12,0.16), transparent 24%),
+                var(--bg);
+        }
+
+        .page {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 32px 18px 56px;
+        }
+
+        .hero {
+            display: grid;
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            width: fit-content;
+            border-radius: 999px;
+            padding: 8px 14px;
+            background: rgba(15,118,110,0.12);
+            color: var(--brand);
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .hero h1 {
+            margin: 0;
+            font-size: clamp(2.4rem, 5vw, 5rem);
+            line-height: 0.94;
+            letter-spacing: -0.05em;
+            max-width: 900px;
+        }
+
+        .hero p {
+            margin: 0;
+            max-width: 760px;
+            color: var(--muted);
+            font-size: 1.05rem;
+        }
+
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .tab-button {
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,0.7);
+            color: var(--ink);
+            border-radius: 999px;
+            padding: 12px 16px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, var(--brand), #115e59);
+            color: #fff;
+            border-color: transparent;
+        }
+
+        .panel {
+            display: none;
+            border: 1px solid var(--line);
+            border-radius: 30px;
+            padding: 24px;
+            background: var(--surface);
+            backdrop-filter: blur(16px);
+            box-shadow: var(--shadow);
+        }
+
+        .panel.active {
+            display: block;
+        }
+
+        .panel-grid {
+            display: grid;
+            gap: 18px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        }
+
+        .field label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .field input, .field select {
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 14px 15px;
+            font-size: 1rem;
+            background: #fff;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        button.primary, a.secondary {
+            border: none;
+            border-radius: 16px;
+            padding: 14px 18px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        button.primary {
+            color: #fff;
+            background: linear-gradient(135deg, var(--brand), #115e59);
+            box-shadow: 0 14px 28px rgba(15,118,110,0.22);
+        }
+
+        a.secondary {
+            color: var(--ink);
+            background: rgba(255,255,255,0.78);
+            border: 1px solid var(--line);
+        }
+
+        .result {
+            margin-top: 22px;
+            border-radius: 22px;
+            border: 1px solid var(--line);
+            background: #fff;
+            padding: 18px;
+            min-height: 72px;
+            white-space: pre-wrap;
+        }
+
+        .result.good {
+            background: #f0fdf4;
+            color: #166534;
+        }
+
+        .result.bad {
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+
+        .result h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        .sample-orders {
+            margin-top: 14px;
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: rgba(15, 118, 110, 0.08);
+            border: 1px solid rgba(15, 118, 110, 0.12);
+        }
+        .sample-orders strong {
+            display: block;
+            margin-bottom: 8px;
+        }
+        .sample-orders span {
+            display: inline-flex;
+            margin: 6px 8px 0 0;
+            border-radius: 999px;
+            padding: 8px 12px;
+            background: #fff;
+            border: 1px solid var(--line);
+            font-size: 0.92rem;
+        }
+
+        .inline-grid {
+            display: grid;
+            gap: 8px;
+        }
+
+        .inline-grid strong {
+            color: var(--ink);
+        }
+
+        @media (max-width: 640px) {
+            .page { padding: 20px 14px 40px; }
+            .panel { padding: 18px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <section class="hero">
+            <span class="eyebrow">Kargo İşlemleri</span>
+            <h1>Kargo Takip</h1>
+            <p>Yeni gönderi oluşturabilir veya sipariş numarasıyla kargo sorgulayabilirsiniz.</p>
+        </section>
+
+        <div class="tabs">
+            <button class="tab-button active" data-tab="create-panel">Yeni Gönderi</button>
+            <button class="tab-button" data-tab="track-panel">Kargo Sorgula</button>
+            <button class="tab-button" data-tab="panel-panel">Gönderi Listesi</button>
+        </div>
+
+        <section class="panel active" id="create-panel">
+            <div class="panel-grid">
+                <div class="field">
+                    <label for="storeName">Mağaza</label>
+                    <input id="storeName" value="TechMarket">
+                </div>
+                <div class="field">
+                    <label for="employeeFirstName">Yetkili Adı</label>
+                    <input id="employeeFirstName" value="Mert">
+                </div>
+                <div class="field">
+                    <label for="employeeLastName">Yetkili Soyadı</label>
+                    <input id="employeeLastName" value="Kaya">
+                </div>
+                <div class="field">
+                    <label for="employeeEmail">Yetkili E-postası</label>
+                    <input id="employeeEmail" value="mert@techmarket.com">
+                </div>
+                <div class="field">
+                    <label for="customerFirstName">Müşteri Adı</label>
+                    <input id="customerFirstName" value="Ayşe">
+                </div>
+                <div class="field">
+                    <label for="customerLastName">Müşteri Soyadı</label>
+                    <input id="customerLastName" value="Yılmaz">
+                </div>
+                <div class="field">
+                    <label for="customerEmail">Müşteri E-postası</label>
+                    <input id="customerEmail" value="ayse@example.com">
+                </div>
+                <div class="field">
+                    <label for="cargoType">Teslimat Tipi</label>
+                    <select id="cargoType">
+                        <option value="STANDARD">STANDARD</option>
+                        <option value="EXPRESS">EXPRESS</option>
+                        <option value="SPECIAL">SPECIAL</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="primary" id="createCargoButton">Gönderiyi Oluştur</button>
+            </div>
+            <div class="result" id="createResult">Henüz yeni bir gönderi oluşturulmadı.</div>
+        </section>
+
+        <section class="panel" id="track-panel">
+            <div class="panel-grid">
+                <div class="field">
+                    <label for="orderNumber">Sipariş Numarası</label>
+                    <input id="orderNumber" placeholder="Örn: SIP-AB12CD34">
+                </div>
+            </div>
+            <div class="sample-orders">
+                <strong>Hazır örnek sipariş numaraları</strong>
+                <span>SIP-AYSE1001</span>
+                <span>SIP-AYSE1002</span>
+                <span>SIP-AYSE1003</span>
+                <span>SIP-MEHM1001</span>
+                <span>SIP-MEHM1002</span>
+                <span>SIP-ELIF1001</span>
+            </div>
+            <div class="actions">
+                <button class="primary" id="trackCargoButton">Kargoyu Sorgula</button>
+            </div>
+            <div class="result" id="trackResult">Sipariş numaranızı girerek gönderinizin güncel durumunu görüntüleyebilirsiniz.</div>
+        </section>
+
+        <section class="panel" id="panel-panel">
+            <div class="actions">
+                <a class="secondary" id="panelLink" href="/cargo-panel.html" target="_blank">Gönderi Listesini Aç</a>
+            </div>
+            <div class="result">Bu ekranda mağaza çalışanı kendi gönderilerini, müşteri ise kendisine ait kargoları ayrı ayrı görüntüleyebilir.</div>
+        </section>
+    </div>
+
+    <script>
+        const API_BASE = window.location.protocol === "file:" ? "http://localhost:8080" : window.location.origin;
+        const tabButtons = document.querySelectorAll(".tab-button");
+        const panels = document.querySelectorAll(".panel");
+        const panelLink = document.getElementById("panelLink");
+
+        panelLink.href = `${API_BASE}/cargo-panel.html`;
+
+        tabButtons.forEach(button => {
+            button.addEventListener("click", () => {
+                tabButtons.forEach(item => item.classList.remove("active"));
+                panels.forEach(panel => panel.classList.remove("active"));
+                button.classList.add("active");
+                document.getElementById(button.dataset.tab).classList.add("active");
+            });
+        });
+
+        const createResult = document.getElementById("createResult");
+        const trackResult = document.getElementById("trackResult");
+
+        document.getElementById("createCargoButton").addEventListener("click", async () => {
+            const payload = {
+                storeName: document.getElementById("storeName").value,
+                storeEmployeeFirstName: document.getElementById("employeeFirstName").value,
+                storeEmployeeLastName: document.getElementById("employeeLastName").value,
+                storeEmployeeEmail: document.getElementById("employeeEmail").value,
+                customerFirstName: document.getElementById("customerFirstName").value,
+                customerLastName: document.getElementById("customerLastName").value,
+                customerEmail: document.getElementById("customerEmail").value,
+                cargoType: document.getElementById("cargoType").value
+            };
+
+            const response = await fetch(`${API_BASE}/api/cargoes`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+            createResult.className = "result " + (response.ok ? "good" : "bad");
+
+            if (!response.ok) {
+                createResult.textContent = data.message || "Gönderi oluşturulamadı.";
+                return;
+            }
+
+            document.getElementById("orderNumber").value = data.orderNumber;
+            createResult.innerHTML = `
+                <h3>Gönderi başarıyla oluşturuldu</h3>
+                <div class="inline-grid">
+                    <span><strong>Sipariş Numarası:</strong> ${data.orderNumber}</span>
+                    <span><strong>Takip Numarası:</strong> ${data.trackingNumber}</span>
+                    <span><strong>Müşteri:</strong> ${data.customerFullName}</span>
+                    <span><strong>Mağaza:</strong> ${data.storeName}</span>
+                    <span><strong>Bilgilendirme:</strong> ${data.notificationMessage}</span>
+                </div>
+            `;
+        });
+
+        document.getElementById("trackCargoButton").addEventListener("click", async () => {
+            const orderNumber = document.getElementById("orderNumber").value.trim();
+            const response = await fetch(`${API_BASE}/api/cargoes/order/${encodeURIComponent(orderNumber)}`);
+            const data = await response.json();
+            trackResult.className = "result " + (response.ok ? "good" : "bad");
+
+            if (!response.ok) {
+                trackResult.textContent = data.message || "Gönderi sorgulanamadı.";
+                return;
+            }
+
+            trackResult.innerHTML = `
+                <h3>Gönderi bulundu</h3>
+                <div class="inline-grid">
+                    <span><strong>Sipariş Numarası:</strong> ${data.orderNumber}</span>
+                    <span><strong>Takip Numarası:</strong> ${data.trackingNumber}</span>
+                    <span><strong>Durum:</strong> ${data.status}</span>
+                    <span><strong>Müşteri:</strong> ${data.customerFullName}</span>
+                    <span><strong>Müşteri E-postası:</strong> ${data.customerEmail}</span>
+                    <span><strong>Mağaza Çalışanı:</strong> ${data.storeEmployeeFullName}</span>
+                    <span><strong>Mağaza:</strong> ${data.storeName}</span>
+                    <span><strong>Kargo Tipi:</strong> ${data.cargoType}</span>
+                    <span><strong>Açıklama:</strong> ${data.description}</span>
+                </div>
+            `;
+        });
+
+        if (window.location.protocol === "file:") {
+            createResult.className = "result bad";
+            createResult.textContent = "Bu sayfa dosya olarak açılmış. Butonların çalışması için arka planda Spring Boot uygulamasının `http://localhost:8080` adresinde çalışıyor olması gerekir.";
+        }
+    </script>
+</body>
+</html>
