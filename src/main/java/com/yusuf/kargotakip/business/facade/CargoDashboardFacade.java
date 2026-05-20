@@ -23,15 +23,21 @@ public class CargoDashboardFacade {
     private final CargoViewService cargoViewService;
     private final List<CargoCardDecorator> cargoCardDecorators;
 
-    public CargoPanelResponse buildPanel(UserRole role, String username) {
-        List<Cargo> cargoes = cargoViewService.getAuthorizedCargoes(role, username);
+    public CargoPanelResponse buildPanel(UserRole role, String mail) {
+    	
+        List<Cargo> cargoes = cargoViewService.getAuthorizedCargoes(role, mail);
+        
         List<CargoCardResponse> cargoCards = cargoes.stream()
+        		
                 .map(this::toCargoCard)
+                
                 .map(this::decorateCard)
                 .toList();
 
         CargoPanelSummaryResponse summary = CargoPanelSummaryResponse.builder()
+        		
                 .totalCargoCount(cargoes.size())
+                
                 .deliveredCargoCount(cargoes.stream().filter(cargo -> cargo.getStatus() == CargoStatus.TESLIM_EDILDI).count())
                 .inTransitCargoCount(cargoes.stream().filter(cargo -> cargo.getStatus() == CargoStatus.DAGITIMDA).count())
                 .expressCargoCount(cargoes.stream().filter(cargo -> cargo.getCargoType() == CargoType.EXPRESS).count())
@@ -39,7 +45,7 @@ public class CargoDashboardFacade {
                 .build();
 
         return CargoPanelResponse.builder()
-                .username(username)
+                .username(mail)
                 .role(role.name())
                 .summary(summary)
                 .cargoes(cargoCards)
@@ -47,21 +53,24 @@ public class CargoDashboardFacade {
     }
 
     private CargoCardResponse toCargoCard(Cargo cargo) {
+    	
         return CargoCardResponse.builder()
+        		
                 .orderNumber(cargo.getOrderNumber())
+                
                 .trackingNumber(cargo.getTrackingNumber())
                 .status(cargo.getStatus().name())
-                .customerFullName(cargo.getCustomer().getFullName())
+                 .customerFullName(cargo.getCustomer().getFullName())
                 .customerEmail(cargo.getCustomer().getEmail())
-                .storeEmployeeFullName(cargo.getStoreEmployee().getFullName())
+                  .storeEmployeeFullName(cargo.getStoreEmployee().getFullName())
                 .storeName(cargo.getStoreEmployee().getStoreName())
-                .cargoType(cargo.getCargoType().name())
-                .shippingCost(cargo.getShippingCost())
+                   .cargoType(cargo.getCargoType().name())
+                   .shippingCost(cargo.getShippingCost())
                 .priorityDelivery(cargo.isPriorityDelivery())
                 .specialHandling(cargo.isSpecialHandling())
                 .description(cargo.getDescription())
                 .statusDisplayText(getStatusDisplayText(cargo))
-                .build();
+                  .build();
     }
 
     private CargoCardResponse decorateCard(CargoCardResponse cargoCardResponse) {

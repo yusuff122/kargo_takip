@@ -21,6 +21,7 @@ public class GetCargoByTrackingNumberResponse {
     private String storeEmployeeFullName;
     private String storeEmployeeEmail;
     private String storeName;
+    private int distanceKm;
     private String cargoType;
     private BigDecimal shippingCost;
     private boolean priorityDelivery;

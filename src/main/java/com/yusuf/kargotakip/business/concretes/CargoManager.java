@@ -1,12 +1,19 @@
 package com.yusuf.kargotakip.business.concretes;
 
+import java.math.BigDecimal;
+
 import org.springframework.stereotype.Service;
 
 import com.yusuf.kargotakip.business.abstracts.CargoService;
 import com.yusuf.kargotakip.business.factory.CargoFactory;
 import com.yusuf.kargotakip.business.factory.CargoFactoryResolver;
+import com.yusuf.kargotakip.business.patterns.observer.CargoStatusPublisher;
+import com.yusuf.kargotakip.business.patterns.strategy.ShippingCostStrategy;
+import com.yusuf.kargotakip.business.patterns.strategy.ShippingCostStrategyResolver;
 import com.yusuf.kargotakip.business.requests.CreateCargoRequest;
+import com.yusuf.kargotakip.business.requests.UpdateCargoStatusRequest;
 import com.yusuf.kargotakip.business.responses.GetCargoByTrackingNumberResponse;
+import com.yusuf.kargotakip.business.responses.ShippingCostResponse;
 import com.yusuf.kargotakip.business.rules.CargoBusinessRules;
 import com.yusuf.kargotakip.dataAccess.abstracts.CargoRepository;
 import com.yusuf.kargotakip.dataAccess.abstracts.CustomerRepository;
@@ -26,6 +33,8 @@ public class CargoManager implements CargoService {
     private final StoreEmployeeRepository storeEmployeeRepository;
     private final CargoFactoryResolver cargoFactoryResolver;
     private final CargoBusinessRules cargoBusinessRules;
+    private final CargoStatusPublisher cargoStatusPublisher;
+    private final ShippingCostStrategyResolver shippingCostStrategyResolver;
 
     @Override
     public GetCargoByTrackingNumberResponse add(CreateCargoRequest createCargoRequest) {
@@ -41,6 +50,8 @@ public class CargoManager implements CargoService {
         Cargo cargo = cargoFactory.create(createCargoRequest);
         cargo.setCustomer(customer);
         cargo.setStoreEmployee(storeEmployee);
+        ShippingCostStrategy shippingCostStrategy = shippingCostStrategyResolver.resolve(cargo.getCargoType());
+        cargo.setShippingCost(shippingCostStrategy.calculate(cargo));
         Cargo savedCargo = cargoRepository.save(cargo);
 
         return mapToResponse(savedCargo);
@@ -61,6 +72,30 @@ public class CargoManager implements CargoService {
         return mapToResponse(cargo);
     }
 
+    @Override
+    public GetCargoByTrackingNumberResponse updateCargoStatus(String trackingNumber,
+            UpdateCargoStatusRequest updateCargoStatusRequest) {
+        cargoBusinessRules.checkIfCargoExists(trackingNumber);
+        Cargo cargo = cargoRepository.findByTrackingNumber(trackingNumber).orElseThrow();
+        cargo.setStatus(updateCargoStatusRequest.getStatus());
+        Cargo updatedCargo = cargoRepository.save(cargo);
+        cargoStatusPublisher.notifyObservers(updatedCargo);
+        return mapToResponse(updatedCargo);
+    }
+
+    @Override
+    public ShippingCostResponse calculateShippingCost(String trackingNumber) {
+        cargoBusinessRules.checkIfCargoExists(trackingNumber);
+        Cargo cargo = cargoRepository.findByTrackingNumber(trackingNumber).orElseThrow();
+        ShippingCostStrategy strategy = shippingCostStrategyResolver.resolve(cargo.getCargoType());
+        BigDecimal cost = strategy.calculate(cargo);
+
+        return ShippingCostResponse.builder()
+                .trackingNumber(cargo.getTrackingNumber())
+                .cost(cost)
+                .build();
+    }
+
     private GetCargoByTrackingNumberResponse mapToResponse(Cargo cargo) {
         return GetCargoByTrackingNumberResponse.builder()
                 .orderNumber(cargo.getOrderNumber())
@@ -71,6 +106,7 @@ public class CargoManager implements CargoService {
                 .storeEmployeeFullName(cargo.getStoreEmployee().getFullName())
                 .storeEmployeeEmail(cargo.getStoreEmployee().getEmail())
                 .storeName(cargo.getStoreEmployee().getStoreName())
+                .distanceKm(cargo.getDistanceKm())
                 .cargoType(cargo.getCargoType().name())
                 .shippingCost(cargo.getShippingCost())
                 .priorityDelivery(cargo.isPriorityDelivery())

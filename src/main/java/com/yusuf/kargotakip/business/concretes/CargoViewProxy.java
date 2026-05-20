@@ -27,20 +27,27 @@ public class CargoViewProxy implements CargoViewService {
     }
 
     @Override
-    public List<Cargo> getAuthorizedCargoes(UserRole role, String username) {
+    public List<Cargo> getAuthorizedCargoes(UserRole role, String mail) {
+    	
         if (role == null) {
+        	
             throw new BusinessException("Kullanıcı rolü boş bırakılamaz.");
         }
 
-        if (username == null || username.isBlank()) {
+        if (mail == null || mail.isBlank()) {
+        	
             throw new BusinessException("Kullanıcı adı boş bırakılamaz.");
         }
 
-        String normalizedUsername = normalizeUsername(username);
+        String normalizedUsername = normalizeUsername(mail);
+        
         validateUsernameFormat(normalizedUsername);
 
+        
+        
         logger.info("Gönderi görüntüleme isteği alındı. Rol: {}, kullanıcı: {}", role, normalizedUsername);
 
+        
         List<Cargo> authorizedCargoes = target.getAuthorizedCargoes(role, normalizedUsername);
 
         logger.info("Gönderi görüntüleme isteği tamamlandı. Rol: {}, kullanıcı: {}, kayıt sayısı: {}",
@@ -49,16 +56,16 @@ public class CargoViewProxy implements CargoViewService {
         return authorizedCargoes;
     }
 
-    private String normalizeUsername(String username) {
-        return username.trim().toLowerCase(Locale.ROOT);
+    private String normalizeUsername(String mail) {
+        return mail.trim().toLowerCase(Locale.ROOT);
     }
 
-    private void validateUsernameFormat(String username) {
-        if (username.length() > 120) {
+    private void validateUsernameFormat(String mail) {
+        if (mail.length() > 60) {
             throw new BusinessException("Kullanıcı bilgisi çok uzun.");
         }
 
-        if (!username.contains("@") || !username.contains(".")) {
+        if (!mail.contains("@") || !mail.contains(".")) {
             throw new BusinessException("Geçerli bir e-posta adresi giriniz.");
         }
     }

@@ -4,6 +4,7 @@ import com.yusuf.kargotakip.entities.concretes.CargoType;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,6 +37,9 @@ public class CreateCargoRequest {
     @Email(message = "Müşteri e-posta adresi geçerli olmalıdır.")
     @NotBlank(message = "Müşteri e-posta adresi boş bırakılamaz.")
     private String customerEmail;
+
+    @Positive(message = "Mesafe bilgisi sıfırdan büyük olmalıdır.")
+    private int distanceKm;
 
     @NotNull(message = "Kargo tipi boş bırakılamaz.")
     private CargoType cargoType;

@@ -202,6 +202,11 @@
             border: 1px solid var(--line);
             font-size: 0.92rem;
         }
+        .helper {
+            margin-top: 12px;
+            color: var(--muted);
+            font-size: 0.92rem;
+        }
 
         .inline-grid {
             display: grid;
@@ -229,6 +234,7 @@
         <div class="tabs">
             <button class="tab-button active" data-tab="create-panel">Yeni Gönderi</button>
             <button class="tab-button" data-tab="track-panel">Kargo Sorgula</button>
+            <button class="tab-button" data-tab="status-panel">Durum Güncelle</button>
             <button class="tab-button" data-tab="panel-panel">Gönderi Listesi</button>
         </div>
 
@@ -261,6 +267,10 @@
                 <div class="field">
                     <label for="customerEmail">Müşteri E-postası</label>
                     <input id="customerEmail" value="ayse@example.com">
+                </div>
+                <div class="field">
+                    <label for="distanceKm">Mesafe (km)</label>
+                    <input id="distanceKm" type="number" min="1" value="256">
                 </div>
                 <div class="field">
                     <label for="cargoType">Teslimat Tipi</label>
@@ -300,6 +310,29 @@
             <div class="result" id="trackResult">Sipariş numaranızı girerek gönderinizin güncel durumunu görüntüleyebilirsiniz.</div>
         </section>
 
+        <section class="panel" id="status-panel">
+            <div class="panel-grid">
+                <div class="field">
+                    <label for="statusTrackingNumber">Takip Numarası</label>
+                    <input id="statusTrackingNumber" placeholder="Örn: KRG-AB12CD34">
+                </div>
+                <div class="field">
+                    <label for="statusValue">Yeni Durum</label>
+                    <select id="statusValue">
+                        <option value="HAZIRLANIYOR">Hazırlanıyor</option>
+                        <option value="KARGOYA_VERILDI">Kargoya Verildi</option>
+                        <option value="DAGITIMDA">Dağıtımda</option>
+                        <option value="TESLIM_EDILDI">Teslim Edildi</option>
+                    </select>
+                </div>
+            </div>
+            <div class="helper">Mağaza çalışanı takip numarasını girip kargo durumunu güncelleyebilir.</div>
+            <div class="actions">
+                <button class="primary" id="updateStatusButton">Durumu Güncelle</button>
+            </div>
+            <div class="result" id="statusResult">Henüz durum güncellemesi yapılmadı.</div>
+        </section>
+
         <section class="panel" id="panel-panel">
             <div class="actions">
                 <a class="secondary" id="panelLink" href="/cargo-panel.html" target="_blank">Gönderi Listesini Aç</a>
@@ -327,6 +360,7 @@
 
         const createResult = document.getElementById("createResult");
         const trackResult = document.getElementById("trackResult");
+        const statusResult = document.getElementById("statusResult");
 
         document.getElementById("createCargoButton").addEventListener("click", async () => {
             const payload = {
@@ -337,6 +371,7 @@
                 customerFirstName: document.getElementById("customerFirstName").value,
                 customerLastName: document.getElementById("customerLastName").value,
                 customerEmail: document.getElementById("customerEmail").value,
+                distanceKm: Number(document.getElementById("distanceKm").value),
                 cargoType: document.getElementById("cargoType").value
             };
 
@@ -355,6 +390,7 @@
             }
 
             document.getElementById("orderNumber").value = data.orderNumber;
+            document.getElementById("statusTrackingNumber").value = data.trackingNumber;
             createResult.innerHTML = `
                 <h3>Gönderi başarıyla oluşturuldu</h3>
                 <div class="inline-grid">
@@ -362,6 +398,8 @@
                     <span><strong>Takip Numarası:</strong> ${data.trackingNumber}</span>
                     <span><strong>Müşteri:</strong> ${data.customerFullName}</span>
                     <span><strong>Mağaza:</strong> ${data.storeName}</span>
+                    <span><strong>Mesafe:</strong> ${data.distanceKm} km</span>
+                    <span><strong>Ücret:</strong> ₺${data.shippingCost}</span>
                     <span><strong>Bilgilendirme:</strong> ${data.notificationMessage}</span>
                 </div>
             `;
@@ -388,8 +426,39 @@
                     <span><strong>Müşteri E-postası:</strong> ${data.customerEmail}</span>
                     <span><strong>Mağaza Çalışanı:</strong> ${data.storeEmployeeFullName}</span>
                     <span><strong>Mağaza:</strong> ${data.storeName}</span>
+                    <span><strong>Mesafe:</strong> ${data.distanceKm} km</span>
+                    <span><strong>Ücret:</strong> ₺${data.shippingCost}</span>
                     <span><strong>Kargo Tipi:</strong> ${data.cargoType}</span>
                     <span><strong>Açıklama:</strong> ${data.description}</span>
+                </div>
+            `;
+        });
+
+        document.getElementById("updateStatusButton").addEventListener("click", async () => {
+            const trackingNumber = document.getElementById("statusTrackingNumber").value.trim();
+            const status = document.getElementById("statusValue").value;
+
+            const response = await fetch(`${API_BASE}/api/cargoes/${encodeURIComponent(trackingNumber)}/status`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ status })
+            });
+
+            const data = await response.json();
+            statusResult.className = "result " + (response.ok ? "good" : "bad");
+
+            if (!response.ok) {
+                statusResult.textContent = data.message || "Kargo durumu güncellenemedi.";
+                return;
+            }
+
+            statusResult.innerHTML = `
+                <h3>Kargo durumu güncellendi</h3>
+                <div class="inline-grid">
+                    <span><strong>Takip Numarası:</strong> ${data.trackingNumber}</span>
+                    <span><strong>Yeni Durum:</strong> ${data.status}</span>
+                    <span><strong>Müşteri:</strong> ${data.customerFullName}</span>
+                    <span><strong>Mağaza:</strong> ${data.storeName}</span>
                 </div>
             `;
         });
@@ -397,6 +466,8 @@
         if (window.location.protocol === "file:") {
             createResult.className = "result bad";
             createResult.textContent = "Bu sayfa dosya olarak açılmış. Butonların çalışması için arka planda Spring Boot uygulamasının `http://localhost:8080` adresinde çalışıyor olması gerekir.";
+            statusResult.className = "result bad";
+            statusResult.textContent = "Durum güncelleme işlemi için uygulamanın localhost üzerinde açık olması gerekir.";
         }
     </script>
 </body>

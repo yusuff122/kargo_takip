@@ -52,12 +52,17 @@ class CargoDashboardPatternTest {
     void proxyShouldFilterCustomerCargoesByEmail() {
         when(cargoRepository.findAllByCustomer_Email("ayse@example.com")).thenReturn(List.of(
                 StandardCargo.builder()
+                
                         .orderNumber("SIP-11111111")
+                        
                         .trackingNumber("KRG-11111111")
                         .status(CargoStatus.HAZIRLANIYOR)
                         .customer(Customer.builder().firstName("Ayşe").lastName("Yılmaz").email("ayse@example.com").build())
+                        
                         .storeEmployee(StoreEmployee.builder().firstName("Mert").lastName("Kaya").email("mert@techmarket.com").storeName("TechMarket").build())
+                        
                         .notificationEmail("ayse@example.com")
+                        .distanceKm(90)
                         .cargoType(CargoType.STANDARD)
                         .shippingCost(new BigDecimal("49.90"))
                         .priorityDelivery(false)
@@ -81,6 +86,7 @@ class CargoDashboardPatternTest {
                         .customer(Customer.builder().firstName("Ayşe").lastName("Yılmaz").email("ayse@example.com").build())
                         .storeEmployee(StoreEmployee.builder().firstName("Ece").lastName("Bulut").email("ece@hizlisepet.com").storeName("Hızlı Sepet").build())
                         .notificationEmail("ayse@example.com")
+                        .distanceKm(240)
                         .cargoType(CargoType.EXPRESS)
                         .shippingCost(new BigDecimal("89.90"))
                         .priorityDelivery(true)
@@ -94,6 +100,7 @@ class CargoDashboardPatternTest {
                         .customer(Customer.builder().firstName("Ayşe").lastName("Yılmaz").email("ayse@example.com").build())
                         .storeEmployee(StoreEmployee.builder().firstName("Selin").lastName("Aras").email("selin@mucevher.com").storeName("Mücevher Dünyası").build())
                         .notificationEmail("ayse@example.com")
+                        .distanceKm(320)
                         .cargoType(CargoType.SPECIAL)
                         .shippingCost(new BigDecimal("129.90"))
                         .priorityDelivery(false)

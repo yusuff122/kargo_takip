@@ -19,10 +19,10 @@ public class CargoViewManager implements CargoViewService {
     private final CargoRepository cargoRepository;
 
     @Override
-    public List<Cargo> getAuthorizedCargoes(UserRole role, String username) {
+    public List<Cargo> getAuthorizedCargoes(UserRole role, String mail) {
         return switch (role) {
-            case CUSTOMER -> cargoRepository.findAllByCustomer_Email(username);
-            case SELLER -> cargoRepository.findAllByStoreEmployee_Email(username);
+            case CUSTOMER -> cargoRepository.findAllByCustomer_Email(mail);
+            case SELLER -> cargoRepository.findAllByStoreEmployee_Email(mail);
             default -> throw new BusinessException("Desteklenmeyen kullanıcı rolü.");
         };
     }

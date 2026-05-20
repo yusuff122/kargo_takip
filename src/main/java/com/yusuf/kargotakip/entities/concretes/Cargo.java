@@ -58,6 +58,9 @@ public abstract class Cargo {
     @Column(name = "notification_email", nullable = false)
     private String notificationEmail;
 
+    @Column(name = "distance_km", nullable = false)
+    private int distanceKm;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "cargo_type", nullable = false)
     private CargoType cargoType;

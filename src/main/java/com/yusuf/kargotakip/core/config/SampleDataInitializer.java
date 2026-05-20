@@ -23,22 +23,22 @@ public class SampleDataInitializer {
 
             GetCargoByTrackingNumberResponse standard = cargoService.add(
                     new CreateCargoRequest("TechMarket", "Mert", "Kaya", "mert@techmarket.com",
-                            "Ayşe", "Yılmaz", "ayse@example.com", CargoType.STANDARD));
+                            "Ayşe", "Yılmaz", "ayse@example.com", 85, CargoType.STANDARD));
             GetCargoByTrackingNumberResponse express = cargoService.add(
                     new CreateCargoRequest("TechMarket", "Mert", "Kaya", "mert@techmarket.com",
-                            "Ayşe", "Yılmaz", "ayse@example.com", CargoType.EXPRESS));
+                            "Ayşe", "Yılmaz", "ayse@example.com", 240, CargoType.EXPRESS));
             GetCargoByTrackingNumberResponse special = cargoService.add(
                     new CreateCargoRequest("Mücevher Dünyası", "Selin", "Aras", "selin@mucevher.com",
-                            "Ayşe", "Yılmaz", "ayse@example.com", CargoType.SPECIAL));
+                            "Ayşe", "Yılmaz", "ayse@example.com", 320, CargoType.SPECIAL));
             GetCargoByTrackingNumberResponse books = cargoService.add(
                     new CreateCargoRequest("Kitap Noktası", "Deniz", "Yalçın", "deniz@kitap.com",
-                            "Mehmet", "Kaya", "mehmet@example.com", CargoType.STANDARD));
+                            "Mehmet", "Kaya", "mehmet@example.com", 180, CargoType.STANDARD));
             GetCargoByTrackingNumberResponse fast = cargoService.add(
                     new CreateCargoRequest("Hızlı Sepet", "Ece", "Bulut", "ece@hizlisepet.com",
-                            "Mehmet", "Kaya", "mehmet@example.com", CargoType.EXPRESS));
+                            "Mehmet", "Kaya", "mehmet@example.com", 410, CargoType.EXPRESS));
             GetCargoByTrackingNumberResponse art = cargoService.add(
                     new CreateCargoRequest("Sanat Atölyesi", "Levent", "Aydın", "levent@sanat.com",
-                            "Elif", "Demir", "elif@example.com", CargoType.SPECIAL));
+                            "Elif", "Demir", "elif@example.com", 260, CargoType.SPECIAL));
 
             assignSampleOrderNumber(cargoRepository, standard.getTrackingNumber(), "SIP-AYSE1001");
             assignSampleOrderNumber(cargoRepository, express.getTrackingNumber(), "SIP-AYSE1002");
